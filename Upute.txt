@@ -1,0 +1,96 @@
+GULP:
+
+Korak 1: Instaliranje Gulp paketa 
+Otvorite terminal i navigirajte do korijenskog direktorija vašeg projekta. Zatim izvršite sljedeću naredbu kako biste instalirali Gulp paket globalno (ako već nije instaliran):
+npm install -g gulp-cli 
+Zatim, unutar istog direktorija, instalirajte Gulp kao zavisnost projekta:
+npm init
+npm install gulp --save-dev 
+
+Korak 2: Kreiranje Gulp konfiguracijskog file-a 
+Stvorite datoteku nazvanu gulpfile.js u korijenskom direktoriju vašeg projekta. U ovoj datoteci ćemo definirati zadatke koje želite obaviti pomoću Gulp-a (PRILAGODITE PUTANJE!!!!):
+// Učitavanje potrebnih modula
+const gulp = require('gulp');
+const babel = require('gulp-babel');
+const sass = require('gulp-sass')(require('sass'));
+const minify = require('gulp-minify');
+const minifyCss = require('gulp-clean-css');
+const browserSync = require('browser-sync').create();
+
+// Definiranje zadatka za kompilaciju i minifikaciju JavaScript-a
+gulp.task('js', () =>
+    gulp.src('src/js/**/*.js')
+        .pipe(babel({ presets: ['@babel/env'] }))
+        .pipe(minify())
+        .pipe(gulp.dest('dist/js'))
+);
+
+// Definiranje zadatka za kompilaciju i minifikaciju SCSS-a
+gulp.task('sass', () =>
+    gulp.src('src/scss/**/*.scss')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(minifyCss())
+        .pipe(gulp.dest('dist/css'))
+);
+
+// Definiranje zadatka za praćenje promjena i osvježavanje preglednika
+gulp.task('watch', () => {
+    browserSync.init({
+        server: './'
+    });
+
+    gulp.watch('src/js/**/*.js', gulp.series('js')).on('change', browserSync.reload);
+    gulp.watch('src/scss/**/*.scss', gulp.series('sass')).on('change', browserSync.reload);
+});
+
+// Zadani zadaci koji se izvršavaju pokretanjem 'gulp' u terminalu
+gulp.task('default', gulp.series('js', 'sass', 'watch'));
+
+Korak 3: Izvršite sljedeće naredbe u terminalu kako biste instalirali potrebne Gulp pakete:
+npm install gulp-babel @babel/core @babel/preset-env gulp-sass sass gulp-minify gulp-clean-css browser-sync --save-dev 
+
+Korak 4: Pokretanje Gulp zadatka 
+Nakon što ste sve konfigurirali i instalirali, pokrenite Gulp zadatke unosom sljedeće naredbe u terminalu:
+gulp 
+ili pojedinačnih, npr: 
+gulp sass
+
+Ovo će pokrenuti zadane Gulp zadatke ---> kompilaciju JavaScript-a, SCSS-a i praćenje promjena koje će osvježiti preglednik nakon svake promjene.
+
+Proučite output i prilagodite putanje u index.html kako bi aplikacija radila.
+
+WEBPACK:
+1.	Instalirajte webpack:
+npm install webpack webpack-cli --save-dev
+
+2. 	Kreirajte webpack konfiguracijski file: Stvorite webpack konfiguracijsku datoteku (webpack.config.js) u korijenskom direktoriju vašeg projekta:
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.js', // Ulazna točka - glavna JavaScript datoteka
+  output: {
+    filename: 'bundle.js', // Naziv izlazne bundle datoteke
+    path: path.resolve(__dirname, 'dist'), // Putanja do izlaznog direktorija
+  },
+  mode: "none"
+};
+
+3.	Dodajte scripts naredbu u package.json: U svojoj datoteci package.json, u odjeljku "scripts", dodajte naredbu za pokretanje Webpack bundla. Na primjer:
+"scripts": {
+  "build": "webpack --config webpack.config.js"
+}
+
+4.	Dodajte referencu na skriptu na vašoj stranici i importajte jQuery u app.js:
+index.html
+<body>
+  <script src="dist/bundle.js"></script>
+</body>
+
+app.js
+window.$ = require('./jQuery.js');
+
+5. pokrenite u terminalu:
+npm run build
+
+6. provjerite da li aplikacija radi očekivano
+
